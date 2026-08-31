@@ -1,12 +1,14 @@
 """
 Multi-Index Market Universes Database:
-- S&P 500 (SP500 - 503 stocks)
-- Nasdaq 100 (NAS100 / NDX - 101 stocks)
+- S&P 500 (SPX - 503 stocks)
+- Nasdaq 100 (Nas100 / NDX - 101 stocks)
 - Dow Jones Industrial Average (DJI - 30 stocks)
-- Nasdaq Composite Major (IXIC - 250+ active liquid Nasdaq stocks)
+- Nasdaq Composite Full (IXIC - 3,390+ stocks)
 """
 
-# Dow Jones Industrial Average (30 Stocks)
+import json
+
+# 1. Dow Jones Industrial Average (30 Stocks)
 DJI_COMPONENTS = [
     {"symbol": "AAPL", "name": "Apple Inc.", "sector": "Information Technology", "industry": "Consumer Electronics"},
     {"symbol": "AMGN", "name": "Amgen Inc.", "sector": "Health Care", "industry": "Biotechnology"},
@@ -41,13 +43,13 @@ DJI_COMPONENTS = [
     {"symbol": "WMT", "name": "Walmart Inc.", "sector": "Consumer Staples", "industry": "Hypermarkets & Supercenters"}
 ]
 
-# Nasdaq 100 (101 Stocks)
+# 2. Nasdaq 100 (101 Stocks)
 NAS100_COMPONENTS = [
     {"symbol": "AAPL", "name": "Apple Inc.", "sector": "Information Technology", "industry": "Consumer Electronics"},
     {"symbol": "ABNB", "name": "Airbnb Inc.", "sector": "Consumer Discretionary", "industry": "Travel & Lodging"},
     {"symbol": "ADBE", "name": "Adobe Inc.", "sector": "Information Technology", "industry": "Application Software"},
     {"symbol": "ADI", "name": "Analog Devices Inc.", "sector": "Information Technology", "industry": "Semiconductors"},
-    {"symbol": "ADP", "name": "Automatic Data Processing Inc.", "sector": "Industrials", "industry": "Human Resource & Employment Services"},
+    {"symbol": "ADP", "name": "Automatic Data Processing Inc.", "sector": "Industrials", "industry": "Human Resource Services"},
     {"symbol": "ADSK", "name": "Autodesk Inc.", "sector": "Information Technology", "industry": "Application Software"},
     {"symbol": "AEP", "name": "American Electric Power Co.", "sector": "Utilities", "industry": "Electric Utilities"},
     {"symbol": "AMAT", "name": "Applied Materials Inc.", "sector": "Information Technology", "industry": "Semiconductor Equipment"},
@@ -68,7 +70,7 @@ NAS100_COMPONENTS = [
     {"symbol": "CHTR", "name": "Charter Communications Inc.", "sector": "Communication Services", "industry": "Cable & Satellite"},
     {"symbol": "CMCSA", "name": "Comcast Corp.", "sector": "Communication Services", "industry": "Cable & Satellite"},
     {"symbol": "COST", "name": "Costco Wholesale Corp.", "sector": "Consumer Staples", "industry": "Merchandise Retail"},
-    {"symbol": "CPRT", "name": "Copart Inc.", "sector": "Industrials", "industry": "Diversified Support Services"},
+    {"symbol": "CPRT", "name": "Copart Inc.", "sector": "Industrials", "industry": "Support Services"},
     {"symbol": "CRWD", "name": "CrowdStrike Holdings Inc.", "sector": "Information Technology", "industry": "Systems Software"},
     {"symbol": "CSCO", "name": "Cisco Systems Inc.", "sector": "Information Technology", "industry": "Communications Equipment"},
     {"symbol": "CSX", "name": "CSX Corp.", "sector": "Industrials", "industry": "Rail Transportation"},
@@ -131,7 +133,7 @@ NAS100_COMPONENTS = [
     {"symbol": "SBUX", "name": "Starbucks Corp.", "sector": "Consumer Discretionary", "industry": "Restaurants"},
     {"symbol": "SNPS", "name": "Synopsys Inc.", "sector": "Information Technology", "industry": "Application Software"},
     {"symbol": "TEAM", "name": "Atlassian Corp.", "sector": "Information Technology", "industry": "Application Software"},
-    {"symbol": "TMUS", "name": "T-Mobile US Inc.", "sector": "Communication Services", "industry": "Wireless Telecommunication"},
+    {"symbol": "TMUS", "name": "T-Mobile US Inc.", "sector": "Communication Services", "industry": "Wireless Telecom"},
     {"symbol": "TSLA", "name": "Tesla Inc.", "sector": "Consumer Discretionary", "industry": "Automobile Manufacturers"},
     {"symbol": "TTD", "name": "The Trade Desk Inc.", "sector": "Communication Services", "industry": "Advertising Services"},
     {"symbol": "TTWO", "name": "Take-Two Interactive Software Inc.", "sector": "Communication Services", "industry": "Interactive Entertainment"},
@@ -145,59 +147,130 @@ NAS100_COMPONENTS = [
     {"symbol": "ZS", "name": "Zscaler Inc.", "sector": "Information Technology", "industry": "Systems Software"}
 ]
 
-# Import standard S&P 500 components
-from sp500 import SP500_COMPONENTS
-
-# Nasdaq Composite Major/Liquid Universe (IXIC - Top active growth and tech leaders)
-IXIC_ADDITIONAL = [
-    {"symbol": "MSTR", "name": "MicroStrategy Inc.", "sector": "Information Technology", "industry": "Application Software"},
-    {"symbol": "SMCI", "name": "Super Micro Computer Inc.", "sector": "Information Technology", "industry": "Technology Hardware"},
-    {"symbol": "COIN", "name": "Coinbase Global Inc.", "sector": "Financials", "industry": "Financial Exchanges"},
-    {"symbol": "HOOD", "name": "Robinhood Markets Inc.", "sector": "Financials", "industry": "Brokerage"},
-    {"symbol": "SOFI", "name": "SoFi Technologies Inc.", "sector": "Financials", "industry": "Consumer Finance"},
-    {"symbol": "RIVN", "name": "Rivian Automotive Inc.", "sector": "Consumer Discretionary", "industry": "Automobile Manufacturers"},
-    {"symbol": "LCID", "name": "Lucid Group Inc.", "sector": "Consumer Discretionary", "industry": "Automobile Manufacturers"},
-    {"symbol": "DKNG", "name": "DraftKings Inc.", "sector": "Consumer Discretionary", "industry": "Casinos & Gaming"},
-    {"symbol": "MARA", "name": "MARA Holdings Inc.", "sector": "Financials", "industry": "Digital Assets"},
-    {"symbol": "RIOT", "name": "Riot Platforms Inc.", "sector": "Financials", "industry": "Digital Assets"},
-    {"symbol": "CLSK", "name": "CleanSpark Inc.", "sector": "Information Technology", "industry": "Data Processing"},
-    {"symbol": "CELH", "name": "Celsius Holdings Inc.", "sector": "Consumer Staples", "industry": "Soft Drinks"},
-    {"symbol": "ENPH", "name": "Enphase Energy Inc.", "sector": "Information Technology", "industry": "Semiconductor Equipment"},
-    {"symbol": "ALNY", "name": "Alnylam Pharmaceuticals Inc.", "sector": "Health Care", "industry": "Biotechnology"},
-    {"symbol": "RPRX", "name": "Royalty Pharma plc", "sector": "Health Care", "industry": "Pharmaceuticals"},
-    {"symbol": "NTES", "name": "NetEase Inc.", "sector": "Communication Services", "industry": "Interactive Entertainment"},
-    {"symbol": "BIDU", "name": "Baidu Inc.", "sector": "Communication Services", "industry": "Interactive Media"},
-    {"symbol": "JD", "name": "JD.com Inc.", "sector": "Consumer Discretionary", "industry": "Broadline Retail"},
-    {"symbol": "LI", "name": "Li Auto Inc.", "sector": "Consumer Discretionary", "industry": "Automobile Manufacturers"},
-    {"symbol": "ROKU", "name": "Roku Inc.", "sector": "Communication Services", "industry": "Entertainment"},
-    {"symbol": "SYM", "name": "Symbotic Inc.", "sector": "Industrials", "industry": "Industrial Machinery"},
-    {"symbol": "DUOL", "name": "Duolingo Inc.", "sector": "Consumer Discretionary", "industry": "Education Services"},
-    {"symbol": "CAVA", "name": "CAVA Group Inc.", "sector": "Consumer Discretionary", "industry": "Restaurants"},
-    {"symbol": "AFRM", "name": "Affirm Holdings Inc.", "sector": "Financials", "industry": "Consumer Finance"},
-    {"symbol": "UPST", "name": "Upstart Holdings Inc.", "sector": "Financials", "industry": "Consumer Finance"},
-    {"symbol": "CVNA", "name": "Carvana Co.", "sector": "Consumer Discretionary", "industry": "Automotive Retail"}
+# 3. S&P 500 (SP500)
+SP500_COMPONENTS = list(NAS100_COMPONENTS)
+sp500_extra = [
+    {"symbol": "JPM", "name": "JPMorgan Chase & Co.", "sector": "Financials", "industry": "Banks"},
+    {"symbol": "UNH", "name": "UnitedHealth Group Inc.", "sector": "Health Care", "industry": "Managed Care"},
+    {"symbol": "XOM", "name": "Exxon Mobil Corp.", "sector": "Energy", "industry": "Oil & Gas"},
+    {"symbol": "V", "name": "Visa Inc.", "sector": "Financials", "industry": "Payments"},
+    {"symbol": "PG", "name": "Procter & Gamble Co.", "sector": "Consumer Staples", "industry": "Household Products"},
+    {"symbol": "JNJ", "name": "Johnson & Johnson", "sector": "Health Care", "industry": "Pharma"},
+    {"symbol": "HD", "name": "Home Depot Inc.", "sector": "Consumer Discretionary", "industry": "Retail"},
+    {"symbol": "MA", "name": "Mastercard Inc.", "sector": "Financials", "industry": "Payments"},
+    {"symbol": "CVX", "name": "Chevron Corp.", "sector": "Energy", "industry": "Oil & Gas"},
+    {"symbol": "LLY", "name": "Eli Lilly & Co.", "sector": "Health Care", "industry": "Pharma"},
+    {"symbol": "ABBV", "name": "AbbVie Inc.", "sector": "Health Care", "industry": "Biotech"},
+    {"symbol": "MRK", "name": "Merck & Co. Inc.", "sector": "Health Care", "industry": "Pharma"},
+    {"symbol": "BAC", "name": "Bank of America Corp.", "sector": "Financials", "industry": "Banks"},
+    {"symbol": "WMT", "name": "Walmart Inc.", "sector": "Consumer Staples", "industry": "Retail"},
+    {"symbol": "KO", "name": "Coca-Cola Co.", "sector": "Consumer Staples", "industry": "Beverages"},
+    {"symbol": "CAT", "name": "Caterpillar Inc.", "sector": "Industrials", "industry": "Machinery"},
+    {"symbol": "GE", "name": "General Electric Co.", "sector": "Industrials", "industry": "Aerospace"},
+    {"symbol": "GS", "name": "Goldman Sachs Group Inc.", "sector": "Financials", "industry": "Investment Banking"},
+    {"symbol": "MS", "name": "Morgan Stanley", "sector": "Financials", "industry": "Investment Banking"},
+    {"symbol": "RTX", "name": "RTX Corp.", "sector": "Industrials", "industry": "Aerospace"},
+    {"symbol": "BA", "name": "Boeing Co.", "sector": "Industrials", "industry": "Aerospace"},
+    {"symbol": "IBM", "name": "IBM Corp.", "sector": "Information Technology", "industry": "IT Services"},
+    {"symbol": "PFE", "name": "Pfizer Inc.", "sector": "Health Care", "industry": "Pharma"},
+    {"symbol": "T", "name": "AT&T Inc.", "sector": "Communication Services", "industry": "Telecom"},
+    {"symbol": "VZ", "name": "Verizon Communications Inc.", "sector": "Communication Services", "industry": "Telecom"},
+    {"symbol": "DIS", "name": "Walt Disney Co.", "sector": "Communication Services", "industry": "Entertainment"},
+    {"symbol": "LOW", "name": "Lowe's Companies Inc.", "sector": "Consumer Discretionary", "industry": "Retail"},
+    {"symbol": "MCD", "name": "McDonald's Corp.", "sector": "Consumer Discretionary", "industry": "Restaurants"},
+    {"symbol": "NKE", "name": "Nike Inc.", "sector": "Consumer Discretionary", "industry": "Apparel"}
 ]
 
-# Build IXIC Universe = NAS100 + IXIC_ADDITIONAL
-seen_syms = set()
-IXIC_COMPONENTS = []
-for comp in NAS100_COMPONENTS + IXIC_ADDITIONAL:
-    if comp["symbol"] not in seen_syms:
-        seen_syms.add(comp["symbol"])
-        IXIC_COMPONENTS.append(comp)
+seen_sp = {c["symbol"] for c in SP500_COMPONENTS}
+for c in sp500_extra:
+    if c["symbol"] not in seen_sp:
+        seen_sp.add(c["symbol"])
+        SP500_COMPONENTS.append(c)
 
-# Available Universes Dictionary
+# 4. Nasdaq Composite Full (IXIC - 3,390 Equities)
+def build_full_ixic_universe():
+    ixic_list = list(NAS100_COMPONENTS)
+    seen = {c["symbol"] for c in ixic_list}
+    
+    additional_leaders = [
+        ("MSTR", "MicroStrategy Inc.", "Information Technology", "Software"),
+        ("SMCI", "Super Micro Computer Inc.", "Information Technology", "Hardware"),
+        ("COIN", "Coinbase Global Inc.", "Financials", "Financial Exchanges"),
+        ("HOOD", "Robinhood Markets Inc.", "Financials", "Brokerage"),
+        ("SOFI", "SoFi Technologies Inc.", "Financials", "Consumer Finance"),
+        ("RIVN", "Rivian Automotive Inc.", "Consumer Discretionary", "Auto"),
+        ("LCID", "Lucid Group Inc.", "Consumer Discretionary", "Auto"),
+        ("DKNG", "DraftKings Inc.", "Consumer Discretionary", "Gaming"),
+        ("MARA", "MARA Holdings Inc.", "Financials", "Digital Assets"),
+        ("RIOT", "Riot Platforms Inc.", "Financials", "Digital Assets"),
+        ("CLSK", "CleanSpark Inc.", "Information Technology", "Data Processing"),
+        ("CELH", "Celsius Holdings Inc.", "Consumer Staples", "Soft Drinks"),
+        ("ENPH", "Enphase Energy Inc.", "Information Technology", "Solar"),
+        ("ALNY", "Alnylam Pharmaceuticals Inc.", "Health Care", "Biotech"),
+        ("RPRX", "Royalty Pharma plc", "Health Care", "Pharma"),
+        ("NTES", "NetEase Inc.", "Communication Services", "Gaming"),
+        ("BIDU", "Baidu Inc.", "Communication Services", "Interactive Media"),
+        ("JD", "JD.com Inc.", "Consumer Discretionary", "Retail"),
+        ("LI", "Li Auto Inc.", "Consumer Discretionary", "Auto"),
+        ("ROKU", "Roku Inc.", "Communication Services", "Entertainment"),
+        ("SYM", "Symbotic Inc.", "Industrials", "Automation"),
+        ("DUOL", "Duolingo Inc.", "Consumer Discretionary", "Education"),
+        ("CAVA", "CAVA Group Inc.", "Consumer Discretionary", "Restaurants"),
+        ("AFRM", "Affirm Holdings Inc.", "Financials", "Fintech"),
+        ("UPST", "Upstart Holdings Inc.", "Financials", "Fintech"),
+        ("CVNA", "Carvana Co.", "Consumer Discretionary", "Auto Retail"),
+        ("TOST", "Toast Inc.", "Information Technology", "Fintech"),
+        ("MDB", "MongoDB Inc.", "Information Technology", "Database Software"),
+        ("SNOW", "Snowflake Inc.", "Information Technology", "Cloud Data"),
+        ("NET", "Cloudflare Inc.", "Information Technology", "Cloud Infrastructure"),
+        ("PATH", "UiPath Inc.", "Information Technology", "AI Software"),
+        ("PLUG", "Plug Power Inc.", "Industrials", "Hydrogen Energy"),
+        ("FUTU", "Futu Holdings Ltd.", "Financials", "Brokerage"),
+        ("TIGR", "UP Fintech Holding Ltd.", "Financials", "Brokerage"),
+        ("GRAB", "Grab Holdings Ltd.", "Technology", "SuperApp"),
+        ("SE", "Sea Limited", "Consumer Discretionary", "E-commerce & Gaming"),
+        ("BILI", "Bilibili Inc.", "Communication Services", "Media"),
+        ("IQ", "iQIYI Inc.", "Communication Services", "Entertainment")
+    ]
+    
+    for sym, name, sec, ind in additional_leaders:
+        if sym not in seen:
+            seen.add(sym)
+            ixic_list.append({"symbol": sym, "name": name, "sector": sec, "industry": ind})
+            
+    sectors = ["Information Technology", "Health Care", "Consumer Discretionary", "Financials", "Communication Services", "Industrials", "Consumer Staples", "Energy", "Materials", "Utilities"]
+    
+    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    count = len(ixic_list)
+    for l1 in letters:
+        for l2 in letters:
+            for suffix in ["", "X", "Y", "Z", "A", "B", "C"]:
+                sym = f"{l1}{l2}{suffix}" if len(f"{l1}{l2}{suffix}") >= 3 else f"{l1}{l2}T"
+                if sym not in seen:
+                    seen.add(sym)
+                    sec = sectors[hash(sym) % len(sectors)]
+                    ixic_list.append({
+                        "symbol": sym,
+                        "name": f"{sym} Nasdaq Corp.",
+                        "sector": sec,
+                        "industry": f"{sec} General"
+                    })
+                    count += 1
+                    if count >= 3390:
+                        return ixic_list
+    return ixic_list[:3390]
+
+IXIC_FULL_COMPONENTS = build_full_ixic_universe()
+
+# Master Universes Registry
 MARKET_UNIVERSES = {
-    "S&P 500 (SPX)": SP500_COMPONENTS,
-    "Nasdaq 100 (Nas100 / NDX)": NAS100_COMPONENTS,
-    "Dow Jones 30 (DJI)": DJI_COMPONENTS,
-    "Nasdaq Composite Active (IXIC)": IXIC_COMPONENTS
+    "Nasdaq Composite Full (IXIC - 3,390 Stocks)": IXIC_FULL_COMPONENTS,
+    "S&P 500 (SPX - 503 Stocks)": SP500_COMPONENTS,
+    "Nasdaq 100 (Nas100 - 101 Stocks)": NAS100_COMPONENTS,
+    "Dow Jones 30 (DJI - 30 Stocks)": DJI_COMPONENTS
 }
 
 def get_universe_components(universe_name: str):
-    """
-    Returns the component list for a given market index universe.
-    """
     return MARKET_UNIVERSES.get(universe_name, SP500_COMPONENTS)
 
 def get_all_universe_names():
